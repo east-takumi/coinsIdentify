@@ -12,21 +12,32 @@ from PIL import Image
 #############################################
 # ハフ変換
 def houghCircles(src):
-    blur = cv2.medianBlur(coins_gray, 5)
+    #　3*3のメジアンフィルタ処理
+    blur = cv2.medianBlur(src, 5)
+
+    # ハフ変換による円の中心座標と半径の抽出
+    # 全硬貨を検出対象
     circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=30, minRadius=30, maxRadius=60)
 
-    area = np.zeros(7)
+    area = np.zeros(len(circles[0]))
+
+    # 検出値を少数第一位で四捨五入し、16bit符号なし整数に変換
     circles = np.uint16(np.around(circles))
+    # print(circles)
+
+    # if circles
+    # circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=30, minRadius=5, maxRadius=15)
+
     i = 0
     for (x, y, r) in circles[0]:
         i += 1
-        cv2.circle(coins_gray, (x, y), r, (0, 255, 0), 2)
-        cv2.circle(coins_gray, (x, y), 2, (0, 0, 255), 3)
+        cv2.circle(src, (x, y), r, (0, 255, 0), 2)
+        cv2.circle(src, (x, y), 2, (0, 0, 255), 3)
         area[i-1] = r * r * 3.14
         print(area)
 
-    cv2.imshow('detected circles',coins_gray)
-#############################################
+    cv2.imshow('detected circles',src)
+# #############################################
 
 
 # ##################################
