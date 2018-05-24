@@ -10,6 +10,36 @@ from PIL import Image
 
 
 
+#############################################
+# ハフ変換
+def houghCircles(src):
+    #　3*3のメジアンフィルタ処理
+    blur = cv2.medianBlur(src, 5)
+
+    # ハフ変換による円の中心座標と半径の抽出
+    # 全硬貨を検出対象
+    circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=30, minRadius=30, maxRadius=60)
+
+    area = np.zeros(len(circles[0]))
+
+    # 検出値を少数第一位で四捨五入し、16bit符号なし整数に変換
+    circles = np.uint16(np.around(circles))
+    # print(circles)
+
+    # if circles
+    # circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=30, minRadius=5, maxRadius=15)
+
+    i = 0
+    for (x, y, r) in circles[0]:
+        i += 1
+        cv2.circle(src, (x, y), r, (0, 255, 0), 2)
+        cv2.circle(src, (x, y), 2, (0, 0, 255), 3)
+        area[i-1] = r * r * 3.14
+        print(area)
+
+    cv2.imshow('detected circles',src)
+#############################################
+
 # ##################################
 # # 膨張処理
 # def dilate(src, ksize=3):
@@ -172,56 +202,39 @@ coins_binary[coins_gray_array>=140] = 255
 # plt.show()
 #########################################
 
-#############################################
-# ハフ変換
 
-blur = cv2.medianBlur(coins_gray, 5)
-circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=30, minRadius=30, maxRadius=60)
+houghCircles(coins_gray)
 
-area = np.zeros(7)
-circles = np.uint16(np.around(circles))
-i = 0
-for (x, y, r) in circles[0]:
-    i += 1
-    cv2.circle(coins_gray, (x, y), r, (0, 255, 0), 2)
-    cv2.circle(coins_gray, (x, y), 2, (0, 0, 255), 3)
-    area[i-1] = r * r * 3.14
-    print(area)
-
-cv2.imshow('detected circles',coins_gray)
-#############################################
-
-
-#############################################
-# 面積値から合計金額を算出
-
-one_yen = 0
-five_yen = 0
-ten_yen = 0
-five_ten_yen = 0
-hundred_yen = 0
-five_hundred_yen = 0
-
-for j in range(7):
-    if area[j] < 3800:
-        break
-    elif area[j] < 4000:
-        one_yen += 1
-    elif area[j] < 5000:
-        five_ten_yen += 1
-    elif area[j] < 5800:
-        five_yen += 1
-    elif area[j] < 6000:
-        ten_yen += 1
-    elif area[j] < 7000:
-        hundred_yen += 1
-    elif area[j] < 8500:
-        five_hundred_yen += 1
-
-
-sum = one_yen + five_yen*5 + ten_yen*10 + five_ten_yen*50 + hundred_yen*100 + five_hundred_yen*500
-print(sum)
-#############################################
+# #############################################
+# # 面積値から合計金額を算出
+#
+# one_yen = 0
+# five_yen = 0
+# ten_yen = 0
+# five_ten_yen = 0
+# hundred_yen = 0
+# five_hundred_yen = 0
+#
+# for j in range(7):
+#     if area[j] < 3800:
+#         break
+#     elif area[j] < 4000:
+#         one_yen += 1
+#     elif area[j] < 5000:
+#         five_ten_yen += 1
+#     elif area[j] < 5800:
+#         five_yen += 1
+#     elif area[j] < 6000:
+#         ten_yen += 1
+#     elif area[j] < 7000:
+#         hundred_yen += 1
+#     elif area[j] < 8500:
+#         five_hundred_yen += 1
+#
+#
+# sum = one_yen + five_yen*5 + ten_yen*10 + five_ten_yen*50 + hundred_yen*100 + five_hundred_yen*500
+# print(sum)
+# #############################################
 
 
 # # for i in range(255):
